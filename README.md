@@ -7,16 +7,40 @@ This repo contains practical code examples and implementations designed to help 
 ## Getting Started
 
 1. Clone this repository:
-   ```bash
-   git clone https://github.com/your-username/jupiter-api-examples.git
-   cd jupiter-api-examples
-   ```
+```bash
+git clone https://github.com/your-username/jupiter-api-examples.git
+cd jupiter-api-examples
+```
 
-2. Review the documentation for setup requirements:
+2. Set up the required environment variables:
+   - Scripts in this repository rely on environment variables to securely store sensitive information such as private keys and RPC URLs.
+   - Copy the file `.env-example` to `.env`:
+```bash
+cp .env-example .env
+```
+   - Open the `.env` file and fill in the required values:
+```bash
+PRIVATE_KEY=your_private_key_here
+RPC_URL=https://your_rpc_url_here
+```
+     - `PRIVATE_KEY`: This is your Base58-encoded private key used to sign transactions.
+     - `RPC_URL`: This is the URL for your Solana RPC provider.
+
+3. Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+4. Run any example script in the repository:
+```bash
+python script.py
+```
+
+Each example in this repository has its own `requirements.txt` file to list the specific dependencies needed to run that script.
+
+5. Review the documentation to explore the full potential of the Jupiter Exchange APIs and learn how to integrate them into your projects:
    - [Jupiter API Docs](https://station.jup.ag/docs/)
    - [API Guides](https://station.jup.ag/guides/)
-
-3. Explore the example scripts in the repo and follow the usage instructions provided in individual files.
 
 ---
 
