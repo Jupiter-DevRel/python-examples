@@ -81,5 +81,5 @@ try:
 except RPCException as e:
     error_message = e.args[0]
     print("Transaction failed!")
+    print(f"Custom Program Error Code: {error_message.data.err.err.code}")
     print(f"Message: {error_message.message}")
-    print(f"Custom Error Code: {error_message.data.err.err.code}")
