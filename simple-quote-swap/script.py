@@ -4,8 +4,9 @@ import base58
 import base64
 
 from dotenv import load_dotenv
-from solders.keypair import Keypair
-from solders.transaction import VersionedTransaction
+from solana.rpc.api import Client
+from solana.rpc.core import RPCException
+from solders.solders import Keypair, VersionedTransaction
 
 # Load .env file and read environment variables
 load_dotenv()
@@ -16,12 +17,14 @@ if not PRIVATE_KEY or not RPC_URL:
     print("Error: PRIVATE_KEY and RPC_URL must be set in your .env file")
     exit()
 
+# Initialize the Solana RPC client
+rpc = Client(RPC_URL)
 
-# Create a keypair wallet from the private key in the .env file
+# Create a keypair wallet from your private key
 private_key_bytes = base58.b58decode(PRIVATE_KEY)
 wallet = Keypair.from_bytes(private_key_bytes)
 
-# Build Quote: Fetch a quote to swap WSOL (Wrapped SOL) to USDC tokens
+# Fetch a quote to swap WSOL (Wrapped SOL) to USDC tokens
 quote_params = {
     "inputMint": "So11111111111111111111111111111111111111112",  # WSOL
     "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
@@ -38,7 +41,7 @@ quote_data = quote_response.json()
 
 print("Quote response:", quote_data)
 
-# Building Swap
+# Fetch the swap transaction for the quote
 swap_request = {
     "userPublicKey": str(wallet.pubkey()),
     "quoteResponse": quote_data,
@@ -66,23 +69,17 @@ wallet_index = account_keys.index(wallet.pubkey())
 signers = list(raw_transaction.signatures)
 signers[wallet_index] = wallet
 
-raw_signed_transaction = VersionedTransaction(raw_transaction.message, signers)
-signed_transaction = base64.b64encode(bytes(raw_signed_transaction)).decode("utf-8")
+signed_transaction = VersionedTransaction(raw_transaction.message, signers)
 
-# Send transaction to an RPC
-rpc_request = {
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "sendTransaction",
-    "params": [
-        signed_transaction,
-        {"encoding": "base64"},
-    ],
-}
+# Send the signed transaction to the RPC client
+try:
+    rpc_response = rpc.send_transaction(signed_transaction)
 
-rpc_response = requests.post(RPC_URL, json=rpc_request)
-rpc_data = rpc_response.json()
-
-print("RPC Response Status:", rpc_response.status_code)
-print("RPC Response:", rpc_data)
-print(f"View transaction on Solscan: https://solscan.io/tx/{rpc_data['result']}")
+    signature = str(rpc_response.value)
+    print(f"Transaction sent successfully! Signature: {signature}")
+    print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
+except RPCException as e:
+    error_message = e.args[0]
+    print("Transaction failed!")
+    print(f"Message: {error_message.message}")
+    print(f"Custom Error Code: {error_message.data.err.err.code}")
