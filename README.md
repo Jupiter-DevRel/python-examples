@@ -13,18 +13,29 @@ cd jupiter-api-examples
 ```
 
 2. Set up the required environment variables:
+
    - Scripts in this repository rely on environment variables to securely store sensitive information such as private keys and RPC URLs.
+
    - Copy the file `.env-example` to `.env`:
-```bash
-cp .env-example .env
-```
+
+     ```bash
+     cp .env-example .env
+     ```
+
    - Open the `.env` file and fill in the required values:
-```bash
-PRIVATE_KEY=your_private_key_here
-RPC_URL=https://your_rpc_url_here
-```
-     - `PRIVATE_KEY`: This is your Base58-encoded private key used to sign transactions.
-     - `RPC_URL`: This is the URL for your Solana RPC provider.
+
+     ```bash
+     PRIVATE_KEY=your_private_key_here
+     RPC_URL=https://your_rpc_url_here
+     ```
+
+      - `PRIVATE_KEY`: This is your Base58-encoded private key used to sign transactions.
+      - `RPC_URL`: This is the URL for your Solana RPC provider.
+
+     **Note:**
+      - Using a Solana native RPC provider with **staked connections** is highly recommended to ensure your transactions will be landing. If you're unsure what this is, read more here: [stake-weighted QoS (Quality of Service)](https://solana.com/developers/guides/advanced/stake-weighted-qos).
+      - If you do not have access to a staked RPC provider, you can use Solana's default mainnet endpoint:  
+        `https://api.mainnet-beta.solana.com`.
 
 3. Install the required dependencies:
 ```bash
