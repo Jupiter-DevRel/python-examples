@@ -1,76 +1,79 @@
+import os
 import requests
 import base58
 import base64
 
-from solders.keypair import Keypair
-from solders.solders import NullSigner
-from solders.transaction import VersionedTransaction
+from dotenv import load_dotenv
+from solders.solders import Keypair, VersionedTransaction
 
-private_key_base58 = ""
-private_key_bytes = base58.b58decode(private_key_base58)
+# Load .env file and read environment variables
+load_dotenv()
+PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
-keypair = Keypair.from_bytes(private_key_bytes)
-print("Public Key:", keypair.pubkey())
-
-jup_order_api = "https://api.jup.ag/ultra/v1/order"
-jup_execute_api = "https://api.jup.ag/ultra/v1/execute"
-
-IN = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-OUT = "So11111111111111111111111111111111111111112"
-
-params = {
-    "inputMint": IN,
-    "outputMint": OUT,
-    "amount": 10000000,
-    "taker": str(keypair.pubkey())
-}
-
-print("Order request:", jup_order_api, params)
-order_response = requests.get(jup_order_api, params=params)
-order_data = order_response.json()
-
-print("Order:", order_data)
-
-if not order_data:
-    print("Failed to get order!")
+if not PRIVATE_KEY:
+    print("Error: PRIVATE_KEY must be set in your .env file")
     exit()
 
-# Get raw transaction
-transaction_base64 = order_data["transaction"]
-transaction_buffer = base64.b64decode(transaction_base64)
-raw_transaction = VersionedTransaction.from_bytes(transaction_buffer)
+# Create a keypair wallet from your private key
+private_key_bytes = base58.b58decode(PRIVATE_KEY)
+wallet = Keypair.from_bytes(private_key_bytes)
 
-print("Signing transaction...")
-
-# Sign transaction
-account_keys = raw_transaction.message.account_keys
-user_index = account_keys.index(keypair.pubkey())
-
-signers = list(raw_transaction.signatures)
-signers[user_index] = keypair
-if len(signers) > 1:
-    signers[len(signers) - 1 - user_index] = NullSigner(raw_transaction.message.account_keys[0])
-
-signed_tx = VersionedTransaction(raw_transaction.message, signers)
-serialized_tx = base64.b64encode(bytes(signed_tx)).decode("utf-8")
-print("Transaction Base64 Length:", len(serialized_tx))
-
-
-print("Sending signed transaction...")
-
-
-
-execute_request = {
-    "signedTransaction": serialized_tx,
-    "requestId": order_data["requestId"]
+# Fetch a quote to swap WSOL (Wrapped SOL) to USDC tokens
+order_params = {
+    "inputMint": "So11111111111111111111111111111111111111112",  # WSOL
+    "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
+    "amount": 10000000,  # 0.01 WSOL
+    "taker": str(wallet.pubkey()),  # Wallet public key
 }
 
-# Send swap request
-print("Execute request:", execute_request)
-execute_response = requests.post(jup_execute_api, json=execute_request)
-execute_data = execute_response.json()
+order_response = requests.get("https://api.jup.ag/ultra/v1/order", params=order_params)
 
-# Print response from RPC
-print("Execute response status:", execute_response.status_code)
-print("Send Response:", execute_data)
-print(f"https://solscan.io/tx/{execute_data['signature']}")
+if order_response.status_code != 200:
+    print(f"Error fetching order: {order_response.json()}")
+    exit()
+
+order_data = order_response.json()
+
+print("Order response:", order_data)
+
+# Get Raw Transaction
+swap_transaction_base64 = order_data["transaction"]
+swap_transaction_bytes = base64.b64decode(swap_transaction_base64)
+raw_transaction = VersionedTransaction.from_bytes(swap_transaction_bytes)
+
+# Sign Transaction
+account_keys = raw_transaction.message.account_keys
+wallet_index = account_keys.index(wallet.pubkey())
+
+signers = list(raw_transaction.signatures)
+signers[wallet_index] = wallet
+
+signed_transaction = VersionedTransaction(raw_transaction.message, signers)
+serialized_signed_transaction = base64.b64encode(bytes(signed_transaction)).decode("utf-8")
+
+# Execute the order transaction
+execute_request = {
+    "signedTransaction": serialized_signed_transaction,
+    "requestId": order_data["requestId"],
+}
+
+execute_response = requests.post("https://api.jup.ag/ultra/v1/execute", json=execute_request)
+
+if execute_response.status_code == 200:
+    execute_response = execute_response.json()
+    signature = execute_response["signature"]
+
+    if execute_response["status"] == "Success":
+        print(f"Transaction sent successfully! Signature: {signature}")
+        print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
+    else:
+        error_code = execute_response["code"]
+        error_message = execute_response["error"]
+
+        print("Transaction failed!")
+        print(f"Custom Program Error Code: {error_code}")
+        print(f"Message: {error_message}")
+        print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
+else:
+    print(execute_response)
+    print(f"Error executing order: {execute_response.json()}")
