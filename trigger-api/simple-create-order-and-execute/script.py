@@ -18,23 +18,27 @@ if not PRIVATE_KEY:
 private_key_bytes = base58.b58decode(PRIVATE_KEY)
 wallet = Keypair.from_bytes(private_key_bytes)
 
-# Fetch a quote to swap WSOL (Wrapped SOL) to USDC tokens
-order_params = {
+# Create an order to swap WSOL (Wrapped SOL) to USDC tokens
+order_request = {
     "inputMint": "So11111111111111111111111111111111111111112",  # WSOL
     "outputMint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
-    "amount": 10000000,  # 0.01 WSOL
-    "taker": str(wallet.pubkey()),  # Wallet public key
+    "maker": str(wallet.pubkey()),
+    "payer": str(wallet.pubkey()),
+    "params": {
+        "makingAmount": "100000000",  # 0.1 WSOL
+        "takingAmount": "100000000",  # 100 USDC
+    }
 }
 
-order_response = requests.get("https://api.jup.ag/ultra/v1/order", params=order_params)
+order_response = requests.post("https://api.jup.ag/trigger/v1/createOrder", json=order_request)
 
 if order_response.status_code != 200:
-    print(f"Error fetching order: {order_response.json()}")
+    print(f"Error creating order: {order_response.json()}")
     exit()
 
 order_data = order_response.json()
 
-print("Order response:", order_data)
+print("Create order response:", order_data)
 
 # Get Raw Transaction
 swap_transaction_base64 = order_data["transaction"]
@@ -57,7 +61,7 @@ execute_request = {
     "requestId": order_data["requestId"],
 }
 
-execute_response = requests.post("https://api.jup.ag/ultra/v1/execute", json=execute_request)
+execute_response = requests.post("https://api.jup.ag/trigger/v1/execute", json=execute_request)
 
 if execute_response.status_code == 200:
     execute_response = execute_response.json()
@@ -67,12 +71,7 @@ if execute_response.status_code == 200:
         print(f"Transaction sent successfully! Signature: {signature}")
         print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
     else:
-        error_code = execute_response["code"]
-        error_message = execute_response["error"]
-
         print("Transaction failed! Signature: {signature}")
-        print(f"Custom Program Error Code: {error_code}")
-        print(f"Message: {error_message}")
         print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
 else:
     print(f"Error executing order: {execute_response.json()}")

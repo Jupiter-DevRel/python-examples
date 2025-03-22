@@ -80,6 +80,6 @@ try:
     print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
 except RPCException as e:
     error_message = e.args[0]
-    print("Transaction failed!")
+    print("Transaction failed! Signature: {signature}")
     print(f"Custom Program Error Code: {error_message.data.err.err.code}")
     print(f"Message: {error_message.message}")
