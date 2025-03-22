@@ -37,19 +37,24 @@ cd python-examples
       - If you do not have access to a staked RPC provider, you can use Solana's default mainnet endpoint:  
         `https://api.mainnet-beta.solana.com`.
 
-3. Install the required dependencies:
+3. Navigate to the code example you want to run, for example:
+```bash
+cd swap-api/simple-quote-and-swap/
+```
+
+4. Install the required dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Run any example script in the repository:
+5. Run any example script in the repository:
 ```bash
 python main.py
 ```
 
 Each example in this repository has its own `requirements.txt` file to list the specific dependencies needed to run that script.
 
-5. Review the documentation to explore the full potential of the Jupiter Exchange APIs and learn how to integrate them into your projects:
+6. Review the documentation to explore the full potential of the Jupiter Exchange APIs and learn how to integrate them into your projects:
    - [Jupiter API Docs](https://station.jup.ag/docs/)
    - [API Guides](https://station.jup.ag/guides/)
 
