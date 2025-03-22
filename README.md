@@ -44,7 +44,7 @@ pip install -r requirements.txt
 
 4. Run any example script in the repository:
 ```bash
-python script.py
+python main.py
 ```
 
 Each example in this repository has its own `requirements.txt` file to list the specific dependencies needed to run that script.
