@@ -8,8 +8,8 @@ This repo contains practical code examples and implementations designed to help 
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/your-username/jupiter-api-examples.git
-cd jupiter-api-examples
+git clone https://github.com/Jupiter-DevRel/python-examples.git
+cd python-examples
 ```
 
 2. Set up the required environment variables:
