@@ -60,17 +60,17 @@ execute_request = {
 execute_response = requests.post("https://api.jup.ag/ultra/v1/execute", json=execute_request)
 
 if execute_response.status_code == 200:
-    execute_response = execute_response.json()
-    signature = execute_response["signature"]
+    error_data = execute_response.json()
+    signature = error_data["signature"]
 
-    if execute_response["status"] == "Success":
+    if error_data["status"] == "Success":
         print(f"Transaction sent successfully! Signature: {signature}")
         print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
     else:
-        error_code = execute_response["code"]
-        error_message = execute_response["error"]
+        error_code = error_data["code"]
+        error_message = error_data["error"]
 
-        print("Transaction failed! Signature: {signature}")
+        print(f"Transaction failed! Signature: {signature}")
         print(f"Custom Program Error Code: {error_code}")
         print(f"Message: {error_message}")
         print(f"View transaction on Solscan: https://solscan.io/tx/{signature}")
