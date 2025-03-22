@@ -1,4 +1,4 @@
-# Jupiter Exchange Python API Code Examples
+# Jupiter Exchange API Python Code Examples
 
 This repo contains practical code examples and implementations designed to help developers work with the [Jupiter Exchange APIs](https://station.jup.ag/docs/). Our goal is to empower developers with the knowledge and inspiration to build innovative applications leveraging Jupiter's ecosystem.
 
