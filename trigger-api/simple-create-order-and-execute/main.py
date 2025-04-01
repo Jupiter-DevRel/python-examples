@@ -9,6 +9,13 @@ from solders.solders import Keypair, VersionedTransaction
 # Load .env file and read environment variables
 load_dotenv()
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+API_KEY = os.getenv("API_KEY")
+
+# Free tier users should use lite-api.jup.ag. api.jup.ag is for paid plans and requires an API key
+API_BASE_URL = "https://api.jup.ag" if API_KEY else "https://lite-api.jup.ag"
+
+# Set up headers for API requests (include x-api-key if API_KEY is available)
+headers = {"x-api-key": API_KEY} if API_KEY else {}
 
 if not PRIVATE_KEY:
     print("Error: PRIVATE_KEY must be set in your .env file")
@@ -30,7 +37,8 @@ order_request = {
     }
 }
 
-order_response = requests.post("https://api.jup.ag/trigger/v1/createOrder", json=order_request)
+order_endpoint = f"{API_BASE_URL}/trigger/v1/createOrder"
+order_response = requests.post(order_endpoint, json=order_request)
 
 if order_response.status_code != 200:
     print(f"Error creating order: {order_response.json()}")
@@ -61,7 +69,8 @@ execute_request = {
     "requestId": order_data["requestId"],
 }
 
-execute_response = requests.post("https://api.jup.ag/trigger/v1/execute", json=execute_request)
+execute_endpoint = f"{API_BASE_URL}/trigger/v1/execute"
+execute_response = requests.post(execute_endpoint, json=execute_request)
 
 if execute_response.status_code == 200:
     error_data = execute_response.json()

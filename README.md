@@ -14,7 +14,7 @@ cd python-examples
 
 2. Set up the required environment variables:
 
-   - Scripts in this repository rely on environment variables to securely store sensitive information such as private keys and RPC URLs.
+   - Scripts in this repository rely on environment variables to securely store sensitive information such as private keys, RPC URLs, and optional API keys for Jupiter's API.
 
    - Copy the file `.env-example` to `.env`:
 
@@ -27,10 +27,12 @@ cd python-examples
      ```bash
      PRIVATE_KEY=your_private_key_here
      RPC_URL=https://your_rpc_url_here
+     API_KEY=your_jupiter_api_key_here
      ```
 
       - `PRIVATE_KEY`: This is your Base58-encoded private key used to sign transactions.
       - `RPC_URL`: This is the URL for your Solana RPC provider.
+      - `API_KEY` *(optional)*: Your Jupiter API key if you’ve purchased a plan. Jupiter APIs can be used without an API key for free, but if you want a paid plan with access to higher limits, you can obtain an API key at [Jupiter API Portal](http://portal.jup.ag/).
 
      **Note:**
       - Using a Solana native RPC provider with **staked connections** is highly recommended to ensure your transactions will be landing. If you're unsure what this is, read more here: [stake-weighted QoS (Quality of Service)](https://solana.com/developers/guides/advanced/stake-weighted-qos).

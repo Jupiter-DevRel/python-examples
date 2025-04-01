@@ -12,6 +12,13 @@ from solders.solders import Keypair, VersionedTransaction
 load_dotenv()
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 RPC_URL = os.getenv("RPC_URL")
+API_KEY = os.getenv("API_KEY")
+
+# Free tier users should use lite-api.jup.ag. api.jup.ag is for paid plans and requires an API key
+API_BASE_URL = "https://api.jup.ag" if API_KEY else "https://lite-api.jup.ag"
+
+# Set up headers for API requests (include x-api-key if API_KEY is available)
+headers = {"x-api-key": API_KEY} if API_KEY else {}
 
 if not PRIVATE_KEY or not RPC_URL:
     print("Error: PRIVATE_KEY and RPC_URL must be set in your .env file")
@@ -31,7 +38,8 @@ quote_params = {
     "amount": 10000000,  # 0.01 WSOL
 }
 
-quote_response = requests.get("https://api.jup.ag/swap/v1/quote", params=quote_params)
+quote_endpoint = f"{API_BASE_URL}/swap/v1/quote"
+quote_response = requests.get(quote_endpoint, params=quote_params, headers=headers)
 
 if quote_response.status_code != 200:
     print(f"Error fetching quote: {quote_response.json()}")
@@ -47,7 +55,8 @@ swap_request = {
     "quoteResponse": quote_data,
 }
 
-swap_response = requests.post("https://api.jup.ag/swap/v1/swap", json=swap_request)
+swap_endpoint = f"{API_BASE_URL}/swap/v1/swap"
+swap_response = requests.post(swap_endpoint, json=swap_request, headers=headers)
 
 if swap_response.status_code != 200:
     print(f"Error performing swap: {swap_response.json()}")
