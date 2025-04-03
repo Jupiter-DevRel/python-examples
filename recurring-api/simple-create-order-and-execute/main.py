@@ -33,7 +33,7 @@ order_request = {
     "params": {
         "time": {
             "inAmount": 100000000,  # 0.1 WSOL
-            "interval": 3600,
+            "interval": 3600,  # Every hour
             "numberOfOrders": 3
         }
     },
