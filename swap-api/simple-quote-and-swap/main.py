@@ -4,6 +4,7 @@ import base58
 import base64
 
 from dotenv import load_dotenv
+from requests import JSONDecodeError
 from solana.rpc.api import Client
 from solana.rpc.core import RPCException
 from solders.solders import Keypair, VersionedTransaction
@@ -42,8 +43,12 @@ quote_endpoint = f"{API_BASE_URL}/swap/v1/quote"
 quote_response = requests.get(quote_endpoint, params=quote_params, headers=headers)
 
 if quote_response.status_code != 200:
-    print(f"Error fetching quote: {quote_response.json()}")
-    exit()
+    try:
+        print(f"Error fetching quote: {quote_response.json()}")
+    except JSONDecodeError as e:
+        print(f"Error fetching quote: {quote_response.json()}")
+    finally:
+        exit()
 
 quote_data = quote_response.json()
 
@@ -59,8 +64,12 @@ swap_endpoint = f"{API_BASE_URL}/swap/v1/swap"
 swap_response = requests.post(swap_endpoint, json=swap_request, headers=headers)
 
 if swap_response.status_code != 200:
-    print(f"Error performing swap: {swap_response.json()}")
-    exit()
+    try:
+        print(f"Error performing swap: {swap_response.json()}")
+    except JSONDecodeError as e:
+        print(f"Error performing swap: {swap_response.json()}")
+    finally:
+        exit()
 
 swap_data = swap_response.json()
 

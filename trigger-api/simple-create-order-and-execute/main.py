@@ -4,6 +4,7 @@ import base58
 import base64
 
 from dotenv import load_dotenv
+from requests import JSONDecodeError
 from solders.solders import Keypair, VersionedTransaction
 
 # Load .env file and read environment variables
@@ -41,8 +42,12 @@ order_endpoint = f"{API_BASE_URL}/trigger/v1/createOrder"
 order_response = requests.post(order_endpoint, json=order_request)
 
 if order_response.status_code != 200:
-    print(f"Error creating order: {order_response.json()}")
-    exit()
+    try:
+        print(f"Error creating order: {order_response.json()}")
+    except JSONDecodeError as e:
+        print(f"Error creating order: {order_response.json()}")
+    finally:
+        exit()
 
 order_data = order_response.json()
 
