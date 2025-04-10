@@ -27,7 +27,7 @@ order_params = {
     "taker": str(wallet.pubkey()),  # Wallet public key
 }
 
-order_response = requests.get("https://api.jup.ag/ultra/v1/order", params=order_params)
+order_response = requests.get("https://lite-api.jup.ag/ultra/v1/order", params=order_params)
 
 if order_response.status_code != 200:
     try:
@@ -62,7 +62,7 @@ execute_request = {
     "requestId": order_data["requestId"],
 }
 
-execute_response = requests.post("https://api.jup.ag/ultra/v1/execute", json=execute_request)
+execute_response = requests.post("https://lite-api.jup.ag/ultra/v1/execute", json=execute_request)
 
 if execute_response.status_code == 200:
     error_data = execute_response.json()
