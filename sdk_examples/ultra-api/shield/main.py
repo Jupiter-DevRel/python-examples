@@ -9,7 +9,6 @@ usdc_mint = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
 try:
     shield_response = client.shield(mints=[wsol_mint, usdc_mint])
 
-    print()
     print("Shield API Response:")
     if shield_response["warnings"]:
         for mint, warnings in shield_response["warnings"].items():

@@ -9,7 +9,6 @@ address = client._get_public_key()
 try:
     balances_response = client.balances(str(address))
 
-    print()
     print("Balances API Response:")
     for token, details in balances_response.items():
         print(f"Token: {token}")
