@@ -16,7 +16,11 @@ try:
     rpc_response = client.order_and_execute(order_request)
     signature = str(rpc_response["signature"])
     assert signature is not None, "Transaction signature is missing or invalid."
-    print(f"Transaction sent successfully! View transaction on Solscan: https://solscan.io/tx/{signature}")
+
+    print("Order and Execute API Response:")
+    print(f"  - Transaction Signature: {signature}")
+    print(f"  - View on Solscan: https://solscan.io/tx/{signature}")
+
 except Exception as e:
     print("Error occurred while processing the swap:", str(e))
 finally:
