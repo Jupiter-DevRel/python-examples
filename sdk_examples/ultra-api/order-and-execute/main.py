@@ -13,11 +13,16 @@ order_request = UltraOrderRequest(
 )
 
 try:
-    rpc_response = client.order_and_execute(order_request)
-    signature = str(rpc_response["signature"])
+    client_response = client.order_and_execute(order_request)
+    signature = str(client_response["signature"])
     assert signature is not None, "Transaction signature is missing or invalid."
 
     print("Order and Execute API Response:")
+    print(f"  - Status: {client_response.get('status')}")
+    if client_response.get("status") == "Failed":
+        print(f"  - Code: {client_response.get('code')}")
+        print(f"  - Error: {client_response.get('error')}")
+
     print(f"  - Transaction Signature: {signature}")
     print(f"  - View on Solscan: https://solscan.io/tx/{signature}")
 
