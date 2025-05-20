@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from jup_ag_sdk.clients.ultra_api_client import UltraApiClient
+from jup_python_sdk.clients.ultra_api_client import UltraApiClient
 
 load_dotenv()
 client = UltraApiClient()

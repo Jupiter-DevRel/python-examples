@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
-from jup_ag_sdk.clients.ultra_api_client import UltraApiClient
-from jup_ag_sdk.models.ultra_api.ultra_order_request_model import UltraOrderRequest
+from jup_python_sdk.clients.ultra_api_client import UltraApiClient
+from jup_python_sdk.models.ultra_api.ultra_order_request_model import UltraOrderRequest
 
 load_dotenv()
 client = UltraApiClient()
@@ -15,7 +15,6 @@ order_request = UltraOrderRequest(
 try:
     client_response = client.order_and_execute(order_request)
     signature = str(client_response["signature"])
-    assert signature is not None, "Transaction signature is missing or invalid."
 
     print("Order and Execute API Response:")
     print(f"  - Status: {client_response.get('status')}")
