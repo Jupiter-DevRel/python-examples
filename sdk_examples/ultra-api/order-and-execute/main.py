@@ -9,7 +9,7 @@ order_request = UltraOrderRequest(
     input_mint="So11111111111111111111111111111111111111112",  # WSOL
     output_mint="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",  # USDC
     amount=10000000,  # 0.01 WSOL
-    taker=client._get_public_key()
+    taker=client._get_public_key(),
 )
 
 try:

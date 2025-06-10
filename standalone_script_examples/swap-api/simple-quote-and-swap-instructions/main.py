@@ -7,8 +7,15 @@ from dotenv import load_dotenv
 from requests import JSONDecodeError
 from solana.rpc.api import Client
 from solana.rpc.core import RPCException
-from solders.solders import Keypair, VersionedTransaction, Instruction, Pubkey, AccountMeta, AddressLookupTableAccount, \
-    MessageV0
+from solders.solders import (
+    Keypair,
+    VersionedTransaction,
+    Instruction,
+    Pubkey,
+    AccountMeta,
+    AddressLookupTableAccount,
+    MessageV0,
+)
 
 # Load .env file and read environment variables
 load_dotenv()
@@ -26,6 +33,7 @@ if not PRIVATE_KEY or not RPC_URL:
     print("Error: PRIVATE_KEY and RPC_URL must be set in your .env file")
     exit()
 
+
 def deserialize_instruction(instruction):
     return Instruction(
         accounts=[
@@ -40,6 +48,7 @@ def deserialize_instruction(instruction):
         program_id=Pubkey.from_string(instruction["programId"]),
     )
 
+
 def fetch_alt_accounts(keys):
     alt_accounts = []
     address_lookup_table_accounts = []
@@ -49,12 +58,15 @@ def fetch_alt_accounts(keys):
                 key=Pubkey.from_string(key),
                 addresses=[
                     Pubkey.from_string(address)
-                    for address in rpc.get_account_info_json_parsed(Pubkey.from_string(key)).value.data.parsed["info"]["addresses"]
-                ]
+                    for address in rpc.get_account_info_json_parsed(
+                        Pubkey.from_string(key)
+                    ).value.data.parsed["info"]["addresses"]
+                ],
             )
         )
 
     return alt_accounts
+
 
 # Initialize the Solana RPC client
 rpc = Client(RPC_URL)
@@ -71,7 +83,7 @@ quote_params = {
 }
 
 quote_endpoint = f"{API_BASE_URL}/swap/v1/quote"
-quote_response = requests.get(quote_endpoint, params=quote_params)
+quote_response = requests.get(quote_endpoint, params=quote_params, headers=headers)
 
 if quote_response.status_code != 200:
     try:
@@ -92,13 +104,19 @@ swap_instructions_request = {
 }
 
 swap_instructions_endpoint = f"{API_BASE_URL}/swap/v1/swap-instructions"
-swap_instructions_response = requests.post(swap_instructions_endpoint, json=swap_instructions_request)
+swap_instructions_response = requests.post(
+    swap_instructions_endpoint, json=swap_instructions_request, headers=headers
+)
 
 if swap_instructions_response.status_code != 200:
     try:
-        print(f"Error performing swap instructions: {swap_instructions_response.json()}")
+        print(
+            f"Error performing swap instructions: {swap_instructions_response.json()}"
+        )
     except JSONDecodeError as e:
-        print(f"Error performing swap instructions: {swap_instructions_response.json()}")
+        print(
+            f"Error performing swap instructions: {swap_instructions_response.json()}"
+        )
     finally:
         exit()
 
@@ -111,12 +129,14 @@ instructions = []
 
 # Compute budget Instructions
 instructions.extend(
-    deserialize_instruction(instr) for instr in swap_instructions_data["computeBudgetInstructions"]
+    deserialize_instruction(instr)
+    for instr in swap_instructions_data["computeBudgetInstructions"]
 )
 
 # Setup Instructions
 instructions.extend(
-    deserialize_instruction(instr) for instr in swap_instructions_data["setupInstructions"]
+    deserialize_instruction(instr)
+    for instr in swap_instructions_data["setupInstructions"]
 )
 
 # Swap Instructions
@@ -130,7 +150,9 @@ if cleanup_instruction:
 # Get address lookup table accounts
 address_lookup_table_accounts = []
 if "addressLookupTableAddresses" in swap_instructions_data:
-    address_lookup_table_accounts = fetch_alt_accounts(swap_instructions_data["addressLookupTableAddresses"])
+    address_lookup_table_accounts = fetch_alt_accounts(
+        swap_instructions_data["addressLookupTableAddresses"]
+    )
 
 # Fetch the latest blockhash
 blockhash = rpc.get_latest_blockhash().value.blockhash
@@ -143,7 +165,7 @@ raw_transaction = VersionedTransaction(
         address_lookup_table_accounts,
         blockhash,
     ),
-    keypairs=[wallet]
+    keypairs=[wallet],
 )
 
 # Sign Transaction

@@ -34,14 +34,14 @@ order_request = {
         "time": {
             "inAmount": 100000000,  # 0.1 WSOL
             "interval": 3600,  # Every hour
-            "numberOfOrders": 3
+            "numberOfOrders": 3,
         }
     },
-    "user": str(wallet.pubkey())
+    "user": str(wallet.pubkey()),
 }
 
 order_endpoint = f"{API_BASE_URL}/recurring/v1/createOrder"
-order_response = requests.post(order_endpoint, json=order_request)
+order_response = requests.post(order_endpoint, json=order_request, headers=headers)
 
 if order_response.status_code != 200:
     try:
@@ -68,7 +68,9 @@ signers = list(raw_transaction.signatures)
 signers[wallet_index] = wallet
 
 signed_transaction = VersionedTransaction(raw_transaction.message, signers)
-serialized_signed_transaction = base64.b64encode(bytes(signed_transaction)).decode("utf-8")
+serialized_signed_transaction = base64.b64encode(bytes(signed_transaction)).decode(
+    "utf-8"
+)
 
 # Execute the order transaction
 execute_request = {
@@ -77,7 +79,9 @@ execute_request = {
 }
 
 execute_endpoint = f"{API_BASE_URL}/recurring/v1/execute"
-execute_response = requests.post(execute_endpoint, json=execute_request)
+execute_response = requests.post(
+    execute_endpoint, json=execute_request, headers=headers
+)
 
 if execute_response.status_code == 200:
     error_data = execute_response.json()

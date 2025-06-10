@@ -19,7 +19,9 @@ if not PRIVATE_KEY:
 private_key_bytes = base58.b58decode(PRIVATE_KEY)
 wallet = Keypair.from_bytes(private_key_bytes)
 
-balances_response = requests.get(f"https://lite-api.jup.ag/ultra/v1/balances/{str(wallet.pubkey())}")
+balances_response = requests.get(
+    f"https://lite-api.jup.ag/ultra/v1/balances/{str(wallet.pubkey())}"
+)
 
 if balances_response.status_code != 200:
     try:
@@ -42,7 +44,9 @@ for key, value in balances_data.items():
             "taker": str(wallet.pubkey()),  # Wallet public key
         }
 
-        order_response = requests.get("https://lite-api.jup.ag/ultra/v1/order", params=order_params)
+        order_response = requests.get(
+            "https://lite-api.jup.ag/ultra/v1/order", params=order_params
+        )
 
         if order_response.status_code != 200:
             try:
@@ -69,7 +73,9 @@ for key, value in balances_data.items():
         signers[wallet_index] = wallet
 
         signed_transaction = VersionedTransaction(raw_transaction.message, signers)
-        serialized_signed_transaction = base64.b64encode(bytes(signed_transaction)).decode("utf-8")
+        serialized_signed_transaction = base64.b64encode(
+            bytes(signed_transaction)
+        ).decode("utf-8")
 
         # Execute the order transaction
         execute_request = {
@@ -77,7 +83,9 @@ for key, value in balances_data.items():
             "requestId": order_data["requestId"],
         }
 
-        execute_response = requests.post("https://lite-api.jup.ag/ultra/v1/execute", json=execute_request)
+        execute_response = requests.post(
+            "https://lite-api.jup.ag/ultra/v1/execute", json=execute_request
+        )
 
         if execute_response.status_code == 200:
             error_data = execute_response.json()
