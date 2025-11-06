@@ -53,9 +53,11 @@ account_keys = raw_transaction.message.account_keys
 wallet_index = account_keys.index(wallet.pubkey())
 
 signers = list(raw_transaction.signatures)
-signers[wallet_index] = wallet
 
-signed_transaction = VersionedTransaction(raw_transaction.message, signers)
+message_bytes = bytes(raw_transaction.message)
+your_signature = wallet.sign_message(message_bytes)
+signers[wallet_index] = your_signature
+signed_transaction = VersionedTransaction.populate(raw_transaction.message, signers)
 serialized_signed_transaction = base64.b64encode(bytes(signed_transaction)).decode(
     "utf-8"
 )
