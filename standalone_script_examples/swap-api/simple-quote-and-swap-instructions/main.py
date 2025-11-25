@@ -101,6 +101,8 @@ print("Quote response:", quote_data)
 swap_instructions_request = {
     "userPublicKey": str(wallet.pubkey()),
     "quoteResponse": quote_data,
+    "dynamicComputeUnitLimit": True,
+    "dynamicSlippage": True,
 }
 
 swap_instructions_endpoint = f"{API_BASE_URL}/swap/v1/swap-instructions"

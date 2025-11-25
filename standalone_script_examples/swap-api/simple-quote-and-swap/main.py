@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from requests import JSONDecodeError
 from solana.rpc.api import Client
 from solana.rpc.core import RPCException
+from solana.rpc.types import TxOpts
 from solders.solders import Keypair, VersionedTransaction
 
 # Load .env file and read environment variables
@@ -58,6 +59,8 @@ print("Quote response:", quote_data)
 swap_request = {
     "userPublicKey": str(wallet.pubkey()),
     "quoteResponse": quote_data,
+    "dynamicComputeUnitLimit": True,
+    "dynamicSlippage": True,
 }
 
 swap_endpoint = f"{API_BASE_URL}/swap/v1/swap"
@@ -91,7 +94,7 @@ signed_transaction = VersionedTransaction(raw_transaction.message, signers)
 
 # Send the signed transaction to the RPC client
 try:
-    rpc_response = rpc.send_transaction(signed_transaction)
+    rpc_response = rpc.send_transaction(signed_transaction, opts=TxOpts(skip_preflight=True))
 
     signature = str(rpc_response.value)
     print(f"Transaction sent successfully! Signature: {signature}")
@@ -99,5 +102,5 @@ try:
 except RPCException as e:
     error_message = e.args[0]
     print("Transaction failed!")
-    print(f"Custom Program Error Code: {error_message.data.err.err.code}")
+    print(f"Custom Program Error Code: {error_message.data}")
     print(f"Message: {error_message.message}")
